@@ -5,6 +5,9 @@
  * 
  * @author Chris Murphy
  */
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class SpeedReader {
 
@@ -12,33 +15,74 @@ public class SpeedReader {
     This method is responsible for updating the text in the window for the speed reader.
     You will need to change the parameters as you complete this part of the assignment.
      */
-    public static void show() {
+    public static void show(String filename, int rate){
+
+        File file = new File(filename);
 
         // this sets up the window... don't forget to call it!
-        setup();
 
         // this represents the number to be displayed in the window
-        int count = 0;
+        
+    
 
-        while (true) { // this is an infinite loop but it's fine for now!
+        try(Scanner scan = new Scanner(file)){
+            setup();
+
+            while(scan.hasNext()){
+                
+            
+                if(StdDraw.isMousePressed()){
+                String word = scan.next();
+
+
+                if (word.length() % 2 == 0){
+                    int index = word.length() / 2;
+                    char redLetter = word.charAt(index);
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                    StdDraw.text(46.25, 50, word);
+                    StdDraw.setPenColor(StdDraw.RED);
+                    StdDraw.text(50, 50, String.valueOf(redLetter));
+                }
+                else if (word.length() % 2 == 1){
+                    int index = word.length() / 2;
+                    char redLetter = word.charAt(index);
+                    StdDraw.setPenColor(StdDraw.BLACK);
+                    StdDraw.text(50, 50, word);
+                    StdDraw.setPenColor(StdDraw.RED);
+                    StdDraw.text(50, 50, String.valueOf(redLetter));
+                }
+
+                StdDraw.show();
+                StdDraw.pause(60000 / rate);
+                StdDraw.clear();
+
+                }
+
+            }
+
+        } catch (FileNotFoundException error){
+            System.out.println("Error reading file");
+        }
+
+         // this is an infinite loop but it's fine for now!
 
             // increment the number to display on each iteration of the loop
-            count++;
+            
 
             // this places the text in the center of the screen
             // the coordinate (50, 50) is used for the center of the text
-            StdDraw.text(50, 50, String.valueOf(count));
+            
 
             // this displays the text
-            StdDraw.show();
+            
 
             // this causes the program to wait for 500ms
-            StdDraw.pause(500);
+            
 
             // this removes everything that is being displayed
-            StdDraw.clear();
+            
 
-        }
+        
 
     }
 
@@ -68,7 +112,27 @@ public class SpeedReader {
 
     public static void main(String[] args) {
         // modify this code as needed in order to pass arguments to the show() method
-        show();
+        
+        if(args.length != 2){
+            System.out.println("Please specify the file name and wpm");
+            return;
+        }
+        
+        int rate;
+        
+        try{
+            rate = Integer.parseInt(args[1]);
+        } catch (NumberFormatException error){
+            System.out.println("Please specify a positive wpm");
+            return;
+        }
+
+        if (rate <= 0){
+            System.out.println("Please specify a positive wpm");
+            return;
+        }
+
+        show(args[0], rate);
     }
     
 }
